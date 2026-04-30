@@ -1,0 +1,26 @@
+# Datasets pesados (fuera de sample/)
+data/*.csv
+
+# Resultados de benchmarks (se regeneran con run_benchmarks.ps1)
+resultados/*.json
+resultados/raw/*.json
+
+# PDFs del curso (material privado, referencia local)
+*.pdf
+
+# Binarios y artefactos de Go
+*.exe
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+NUL
