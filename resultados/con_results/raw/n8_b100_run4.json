@@ -1,0 +1,21 @@
+{
+  "version": "concurrent",
+  "input_file": "data/dataset_final_1M.csv",
+  "workers_token": 8,
+  "workers_lemma": 8,
+  "batch_size": 100,
+  "total_docs": 1000000,
+  "total_tokens": 8847793,
+  "total_lemmas_unique": 45321,
+  "elapsed_total_ms": 5432,
+  "elapsed_read_ms": 5345,
+  "elapsed_token_ms": 5350,
+  "elapsed_lemma_ms": 5349,
+  "peak_memory_mb": 98.80078125,
+  "num_cpus": 8,
+  "tokens_globales": 8847793,
+  "docs_procesados": 1000000,
+  "docs_reales": 244779,
+  "docs_sinteticos": 755221,
+  "mutex_contention_ms": 7.0385
+}

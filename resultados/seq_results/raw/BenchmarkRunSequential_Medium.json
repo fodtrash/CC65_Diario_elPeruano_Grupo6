@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260501-151027",
+  "name": "BenchmarkRunSequential_Medium",
+  "workers": 1,
+  "corpus_docs": 10000,
+  "total_ops": 387,
+  "total_docs": 3870000,
+  "elapsed_nanos": 8319135000,
+  "ns_per_op": 21496472.868217055,
+  "docs_per_sec": 465192.5951436057,
+  "ns_per_doc": 2149.6472868217056
+}

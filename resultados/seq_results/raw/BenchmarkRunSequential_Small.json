@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260501-151027",
+  "name": "BenchmarkRunSequential_Small",
+  "workers": 1,
+  "corpus_docs": 500,
+  "total_ops": 8091,
+  "total_docs": 4045500,
+  "elapsed_nanos": 8403594600,
+  "ns_per_op": 1038634.8535409714,
+  "docs_per_sec": 481401.1375560644,
+  "ns_per_doc": 2077.269707081943
+}
