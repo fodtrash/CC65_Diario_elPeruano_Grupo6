@@ -7,13 +7,13 @@ if (-not (Test-Path $rawDir)) {
 }
 
 $configs = @(
-    @{ name = "n1_b1000";  clean = 1;  token = 1;  lemma = 1;  batch = 1000 },
-    @{ name = "n2_b1000";  clean = 2;  token = 2;  lemma = 2;  batch = 1000 },
-    @{ name = "n4_b1000";  clean = 4;  token = 4;  lemma = 4;  batch = 1000 },
-    @{ name = "n8_b1000";  clean = 8;  token = 8;  lemma = 8;  batch = 1000 },
-    @{ name = "n16_b1000"; clean = 16; token = 16; lemma = 16; batch = 1000 },
-    @{ name = "n8_b100";   clean = 8;  token = 8;  lemma = 8;  batch = 100 },
-    @{ name = "n8_b5000";  clean = 8;  token = 8;  lemma = 8;  batch = 5000 }
+    @{ name = "n1_b1000";  token = 1;  lemma = 1;  batch = 1000 },
+    @{ name = "n2_b1000";  token = 2;  lemma = 2;  batch = 1000 },
+    @{ name = "n4_b1000";  token = 4;  lemma = 4;  batch = 1000 },
+    @{ name = "n8_b1000";  token = 8;  lemma = 8;  batch = 1000 },
+    @{ name = "n16_b1000"; token = 16; lemma = 16; batch = 1000 },
+    @{ name = "n8_b100";   token = 8;  lemma = 8;  batch = 100 },
+    @{ name = "n8_b5000";  token = 8;  lemma = 8;  batch = 5000 }
 )
 
 $repetitions = 5
@@ -22,14 +22,13 @@ $currentRun = 0
 
 Write-Host "----------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host "  BENCHMARK PC2 - $($configs.Count) configs x $repetitions repeticiones = $totalRuns corridas" -ForegroundColor Cyan
-Write-Host "  Tiempo estimado: 12-18 minutos" -ForegroundColor Cyan
 Write-Host "----------------------------------------------------------------" -ForegroundColor Cyan
 Write-Host ""
 
 $startTime = Get-Date
 
 foreach ($cfg in $configs) {
-    Write-Host ">>> Configuracion: $($cfg.name) (workers=$($cfg.clean)/$($cfg.token)/$($cfg.lemma), batch=$($cfg.batch))" -ForegroundColor Yellow
+    Write-Host ">>> Configuracion: $($cfg.name) (workers=T$($cfg.token)/L$($cfg.lemma), batch=$($cfg.batch))" -ForegroundColor Yellow
 
     for ($i = 1; $i -le $repetitions; $i++) {
         $currentRun++
@@ -40,7 +39,7 @@ foreach ($cfg in $configs) {
         $runStart = Get-Date
 
         # Usar cmd /c para evitar que PowerShell interprete los logs de Go (stderr) como errores
-        $goCmd = "go run ./src/concurrent/ -input data/dataset_final_1M.csv -workers-clean $($cfg.clean) -workers-token $($cfg.token) -workers-lemma $($cfg.lemma) -batch-size $($cfg.batch) -output $outFile"
+        $goCmd = "go run ./src/concurrent/ -input data/dataset_final_1M.csv -workers-token $($cfg.token) -workers-lemma $($cfg.lemma) -batch-size $($cfg.batch) -output $outFile"
         cmd /c "$goCmd >nul 2>&1"
 
         $runEnd = Get-Date

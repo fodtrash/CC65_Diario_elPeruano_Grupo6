@@ -14,14 +14,6 @@ Pipeline de preprocesamiento NLP (limpieza, tokenizacion, lematizacion) sobre 1,
 | Ricardo Martin Tejada Ramirez | 202113697 |
 | Jose Giovanni Laura Silvera | 202112986 |
 
-## Estado del entregable
-
-| Componente | Estado | Responsable |
-|---|---|---|
-| Codigo concurrente (pipeline 4 etapas) | Completo | Giovanni |
-| Codigo secuencial (baseline) | En desarrollo | Joaquin |
-| Benchmarks + analisis de speedup | En desarrollo | Ricardo |
-
 ## Estructura del repositorio
 
 ```
@@ -40,7 +32,7 @@ Pipeline de preprocesamiento NLP (limpieza, tokenizacion, lematizacion) sobre 1,
 │   │   ├── lemmatize.go           # Lematizacion por sufijos
 │   │   └── nlp_test.go            # 28 tests unitarios + benchmarks
 │   ├── concurrent/
-│   │   └── main.go                # Pipeline concurrente (4 etapas)
+│   │   └── main.go                # Pipeline concurrente (3 etapas)
 │   ├── sequential/                # (pendiente - Joaquin)
 │   └── benchmarks/                # (pendiente - Ricardo)
 ├── resultados/                    # Metricas JSON (no en Git, regenerables)
@@ -78,7 +70,7 @@ go run ./src/concurrent/ -input data/sample/sample_500.csv
 ```bash
 go run ./src/concurrent/ \
   -input data/dataset_final_1M.csv \
-  -workers-clean 8 -workers-token 8 -workers-lemma 8 \
+  -workers-token 8 -workers-lemma 8 \
   -batch-size 1000 -buffer 8 \
   -output resultados/mi_test.json
 ```
@@ -107,18 +99,18 @@ Speedup medido sobre 1,000,000 documentos (media recortada, 5 repeticiones por c
 
 | Workers | Batch | Tiempo (ms) | Speedup |
 |---|---|---|---|
-| 1 | 1000 | 8309 | 1.00x |
-| 2 | 1000 | 5364 | 1.55x |
-| 4 | 1000 | 3724 | 2.23x |
-| 8 | 1000 | 3123 | **2.66x** |
-| 16 | 1000 | 3186 | 2.61x |
-| 8 | 100 | 3656 | 2.27x |
-| 8 | 5000 | 3417 | 2.43x |
+| 1 | 1000 | 9007 | 1.00x |
+| 2 | 1000 | 5506 | 1.64x |
+| 4 | 1000 | 5504 | 1.64x |
+| 8 | 1000 | 4878 | **1.85x** |
+| 16 | 1000 | 4790 | 1.88x |
+| 8 | 100 | 4934 | 1.83x |
+| 8 | 5000 | 4670 | 1.93x |
 
-- **Speedup optimo:** 2.66x con 8 workers y batch de 1000
+- **Speedup optimo:** 1.85x con 8 workers y batch de 1000 (1.93x con batch=5000)
 - **Hardware:** 8 CPUs logicos, Windows 10/11
 - **Race detector:** limpio (0 data races)
-- **Determinismo:** totales identicos con 1, 4 y 8 workers
+- **Determinismo:** totales identicos en las 35 corridas (tokens=8,847,793, lemmas_unique=45,321)
 
 ## Verificacion formal
 

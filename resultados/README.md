@@ -59,8 +59,7 @@ Cada archivo JSON contiene 21 campos. Los mas relevantes para el analisis:
 |---|---|
 | `elapsed_total_ms` | Tiempo total de ejecucion del pipeline (metrica principal) |
 | `elapsed_read_ms` | Tiempo en lectura del CSV |
-| `elapsed_clean_ms` | Tiempo de la etapa de limpieza |
-| `elapsed_token_ms` | Tiempo de la etapa de tokenizacion |
+| `elapsed_token_ms` | Tiempo de la etapa de tokenizacion (incluye limpieza) |
 | `elapsed_lemma_ms` | Tiempo de la etapa de lematizacion |
 | `peak_memory_mb` | Memoria pico durante la ejecucion |
 | `mutex_contention_ms` | Tiempo acumulado esperando el mutex global |

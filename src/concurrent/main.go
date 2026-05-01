@@ -34,7 +34,6 @@ type Document struct {
 type Metrics struct {
 	Version         string  `json:"version"`
 	InputFile       string  `json:"input_file"`
-	WorkersClean    int     `json:"workers_clean"`
 	WorkersToken    int     `json:"workers_token"`
 	WorkersLemma    int     `json:"workers_lemma"`
 	BatchSize       int     `json:"batch_size"`
@@ -43,7 +42,6 @@ type Metrics struct {
 	TotalLemmasUniq int     `json:"total_lemmas_unique"`
 	ElapsedTotalMs  int64   `json:"elapsed_total_ms"`
 	ElapsedReadMs   int64   `json:"elapsed_read_ms"`
-	ElapsedCleanMs  int64   `json:"elapsed_clean_ms"`
 	ElapsedTokenMs  int64   `json:"elapsed_token_ms"`
 	ElapsedLemmaMs  int64   `json:"elapsed_lemma_ms"`
 	PeakMemoryMB     float64 `json:"peak_memory_mb"`
@@ -78,7 +76,6 @@ type GlobalCounters struct {
 func main() {
 	// ── CLI flags ──
 	inputFile := flag.String("input", "data/dataset_final_1M.csv", "Ruta al CSV de entrada")
-	workersClean := flag.Int("workers-clean", 4, "Número de workers de limpieza")
 	workersToken := flag.Int("workers-token", 4, "Número de workers de tokenización")
 	workersLemma := flag.Int("workers-lemma", 4, "Número de workers de lematización")
 	batchSize := flag.Int("batch-size", 1000, "Documentos por lote")
@@ -86,17 +83,15 @@ func main() {
 	outputFile := flag.String("output", "resultados/concurrent_metrics.json", "Ruta del JSON de métricas")
 	flag.Parse()
 
-	log.Printf("Pipeline concurrente: input=%s workers(C=%d,T=%d,L=%d) batch=%d buffer=%d",
-		*inputFile, *workersClean, *workersToken, *workersLemma, *batchSize, *bufferSize)
+	log.Printf("Pipeline concurrente: input=%s workers(T=%d,L=%d) batch=%d buffer=%d",
+		*inputFile, *workersToken, *workersLemma, *batchSize, *bufferSize)
 
-	// ── Canales del pipeline ──
-	chClean := make(chan []Document, *bufferSize)  // Lector → Limpieza
-	chTokens := make(chan []Document, *bufferSize) // Limpieza → Tokenización
+	// ── Canales del pipeline (3 etapas: Lector → Tokenización → Lematización) ──
+	chTokens := make(chan []Document, *bufferSize) // Lector → Tokenización
 	chLemmas := make(chan []Document, *bufferSize) // Tokenización → Lematización
 
 	// ── Timestamps atómicos para medir cada etapa ──
 	var readStart, readEnd int64
-	var cleanStart, cleanEnd int64
 	var tokenStart, tokenEnd int64
 	var lemmaStart, lemmaEnd int64
 
@@ -110,12 +105,13 @@ func main() {
 
 	// ════════════════════════════════════════════════
 	// ETAPA 1: Lector (1 goroutine — proctype Lector)
+	// Lee el CSV y envía lotes directamente al pool de Tokenización.
 	// ════════════════════════════════════════════════
 	go func() {
 		atomic.StoreInt64(&readStart, time.Now().UnixNano())
 		defer func() {
 			atomic.StoreInt64(&readEnd, time.Now().UnixNano())
-			close(chClean)
+			close(chTokens)
 		}()
 
 		f, err := os.Open(*inputFile)
@@ -158,45 +154,24 @@ func main() {
 			total++
 
 			if len(batch) == *batchSize {
-				chClean <- batch
+				chTokens <- batch
 				batch = make([]Document, 0, *batchSize)
 			}
 		}
 		// Enviar lote parcial restante
 		if len(batch) > 0 {
-			chClean <- batch
+			chTokens <- batch
 		}
 		atomic.StoreInt64(&docCount, total)
 		log.Printf("Lector: %d documentos leídos", total)
 	}()
 
-	// ════════════════════════════════════════════════════
-	// ETAPA 2: WorkerLimpieza (N goroutines + WaitGroup)
-	// ════════════════════════════════════════════════════
-	var wgClean sync.WaitGroup
-	wgClean.Add(*workersClean)
-	for i := 0; i < *workersClean; i++ {
-		go func() {
-			defer wgClean.Done()
-			for batch := range chClean {
-				atomic.CompareAndSwapInt64(&cleanStart, 0, time.Now().UnixNano())
-				for j := range batch {
-					batch[j].SumillaClean = nlp.Clean(batch[j].Sumilla)
-				}
-				chTokens <- batch
-			}
-		}()
-	}
-	// Coordinador: cierra chTokens cuando todos los workers terminan
-	go func() {
-		wgClean.Wait()
-		atomic.StoreInt64(&cleanEnd, time.Now().UnixNano())
-		close(chTokens)
-	}()
-
-	// ══════════════════════════════════════════════════════════
-	// ETAPA 3: WorkerTokenizacion (N goroutines + WaitGroup)
-	// ══════════════════════════════════════════════════════════
+	// ══════════════════════════════════════════════════════════════════
+	// ETAPA 2: WorkerTokenizacion (N goroutines + WaitGroup)
+	// Cada worker aplica Clean() + Tokenize() sobre la Sumilla cruda.
+	// La limpieza (normalización de texto) se integra aquí como paso
+	// previo a la tokenización, no como etapa separada del pipeline.
+	// ══════════════════════════════════════════════════════════════════
 	var wgToken sync.WaitGroup
 	wgToken.Add(*workersToken)
 	for i := 0; i < *workersToken; i++ {
@@ -206,6 +181,9 @@ func main() {
 				atomic.CompareAndSwapInt64(&tokenStart, 0, time.Now().UnixNano())
 				var batchTokens int64
 				for j := range batch {
+					// Limpieza: lowercase, acentos, regex normalize
+					batch[j].SumillaClean = nlp.Clean(batch[j].Sumilla)
+					// Tokenización: split + stopwords + min length
 					batch[j].Tokens = nlp.Tokenize(batch[j].SumillaClean)
 					batchTokens += int64(len(batch[j].Tokens))
 				}
@@ -226,7 +204,7 @@ func main() {
 	}()
 
 	// ══════════════════════════════════════════════════════════════
-	// ETAPA 4: WorkerLematizacion (N goroutines + agregación local)
+	// ETAPA 3: WorkerLematizacion (N goroutines + agregación local)
 	// ══════════════════════════════════════════════════════════════
 	resultsCh := make(chan localResult, *workersLemma)
 	var wgLemma sync.WaitGroup
@@ -321,7 +299,6 @@ func main() {
 	metrics := Metrics{
 		Version:           "concurrent",
 		InputFile:         *inputFile,
-		WorkersClean:      *workersClean,
 		WorkersToken:      *workersToken,
 		WorkersLemma:      *workersLemma,
 		BatchSize:         *batchSize,
@@ -330,7 +307,6 @@ func main() {
 		TotalLemmasUniq:   len(globalLemmas),
 		ElapsedTotalMs:    elapsed.Milliseconds(),
 		ElapsedReadMs:     (atomic.LoadInt64(&readEnd) - atomic.LoadInt64(&readStart)) / 1e6,
-		ElapsedCleanMs:    (atomic.LoadInt64(&cleanEnd) - atomic.LoadInt64(&cleanStart)) / 1e6,
 		ElapsedTokenMs:    (atomic.LoadInt64(&tokenEnd) - atomic.LoadInt64(&tokenStart)) / 1e6,
 		ElapsedLemmaMs:    (atomic.LoadInt64(&lemmaEnd) - atomic.LoadInt64(&lemmaStart)) / 1e6,
 		PeakMemoryMB:      float64(ms.Sys) / (1024 * 1024),
@@ -361,7 +337,7 @@ func main() {
 		log.Printf("Métricas escritas en %s", *outputFile)
 	}
 
-	// ── Validación final (assert del Promela: docs_procesados == N_DOCS) ──
+	// ── Resumen final ──
 	log.Printf("Resumen: docs=%d tokens=%d lemmas_únicos=%d tiempo=%dms",
 		metrics.TotalDocs, metrics.TotalTokens, metrics.TotalLemmasUniq, metrics.ElapsedTotalMs)
 }
