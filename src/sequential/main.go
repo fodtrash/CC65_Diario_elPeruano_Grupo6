@@ -8,7 +8,7 @@
 //
 // Flags:
 //
-//	-csv   ruta al CSV del corpus (default: ../../data/sample/dataset_sample_500_rows.csv)
+//	-input ruta al CSV del corpus (default: ../../data/sample/dataset_sample_500_rows.csv)
 //	-n     límite de documentos a leer del CSV (0 = sin límite)
 //	-nreal documentos REAL  para corpus generado (ignorado si -csv existe)
 //	-nsint documentos SINT  para corpus generado (ignorado si -csv existe)
@@ -32,7 +32,7 @@ const (
 
 func main() {
 	// ── Flags de configuración ───────────────────────────────────────────
-	csvPath := flag.String("csv", defaultCSV, "Ruta al CSV del corpus aumentado")
+	csvPath := flag.String("input", defaultCSV, "Ruta al CSV del corpus aumentado")
 	nLimit := flag.Int("n", 0, "Límite de docs a leer del CSV (0 = todos)")
 	nReal := flag.Int("nreal", defaultNReal, "Docs REAL para corpus generado")
 	nSint := flag.Int("nsint", defaultNSint, "Docs SINT para corpus generado")
@@ -154,11 +154,6 @@ func printReport(
 			fmt.Printf("  ✗ %s\n", v)
 		}
 	}
-	fmt.Println(sep)
-
-	// Nota de referencia para análisis de speedup
-	fmt.Println("  NOTA PARA ANÁLISIS DE SPEEDUP")
-	fmt.Printf("  Tiempo T(1) = %v  →  usar como denominador en S(n) = T(1)/T(n)\n", elapsed)
 	fmt.Println(sep)
 }
 

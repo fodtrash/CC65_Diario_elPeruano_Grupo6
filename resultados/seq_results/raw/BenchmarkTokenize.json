@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260501-151027",
+  "name": "BenchmarkTokenize",
+  "workers": 1,
+  "corpus_docs": 5042828,
+  "total_ops": 5042828,
+  "total_docs": 25430114237584,
+  "elapsed_nanos": 8318588900,
+  "ns_per_op": 1649.5880684409622,
+  "docs_per_sec": 3057022596414.6396,
+  "ns_per_doc": 0.0003271156716907581
+}
