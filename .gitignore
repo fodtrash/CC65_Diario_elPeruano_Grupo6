@@ -1,9 +1,11 @@
 # Datasets pesados (fuera de sample/)
 data/*.csv
 
-# Resultados de benchmarks (se regeneran con run_benchmarks.ps1)
+# Resultados ad-hoc (regenerables, no van al repo)
 resultados/*.json
-resultados/raw/*.json
+
+# Excepcion: los datos raw del benchmark SI van al repo (evidencia experimental)
+!resultados/raw/
 
 # PDFs del curso (material privado, referencia local)
 *.pdf

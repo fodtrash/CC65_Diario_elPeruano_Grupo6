@@ -1,58 +1,72 @@
-# Resultados de benchmarks
+# Resultados del Benchmark — PC2 Pipeline Concurrente
 
-Los archivos JSON de metricas no estan en Git (son regenerables). Este README documenta como obtenerlos.
+Esta carpeta contiene la evidencia experimental del trabajo concurrente del PC2.
 
 ## Estructura
 
 ```
 resultados/
-├── README.md                  # Este archivo
-├── raw/                       # Datos crudos: 7 configs x 5 repeticiones = 35 archivos
-│   ├── n1_b1000_run1.json
-│   ├── n1_b1000_run2.json
-│   ├── ...
-│   └── n8_b5000_run5.json
-└── *.json                     # Metricas sueltas de corridas ad-hoc
+├── README.md                          # Este archivo
+├── raw/                               # 35 JSONs con datos crudos de cada corrida
+│   ├── n1_b1000_run{1..5}.json
+│   ├── n2_b1000_run{1..5}.json
+│   ├── n4_b1000_run{1..5}.json
+│   ├── n8_b1000_run{1..5}.json
+│   ├── n16_b1000_run{1..5}.json
+│   ├── n8_b100_run{1..5}.json
+│   └── n8_b5000_run{1..5}.json
+└── analisis/
+    ├── tabla_maestra.md               # Estadisticas consolidadas
+    ├── parrafos_informe.md            # Parrafos pre-redactados para el informe
+    └── figs/                          # Graficas PNG (se agregan manualmente)
 ```
 
-## Convencion de nombrado (raw/)
+## Como regenerar los datos raw
 
-`n{workers}_b{batch}_run{i}.json`
+Si necesitas regenerar los 35 JSONs de `raw/` desde cero:
 
-- `n` = numero de workers (igual para clean, token, lemma)
-- `b` = tamano de batch
-- `run` = numero de repeticion (1-5)
-
-## Configuraciones del benchmark
-
-| Config | Workers | Batch | Proposito |
-|---|---|---|---|
-| n1_b1000 | 1 | 1000 | Baseline secuencial |
-| n2_b1000 | 2 | 1000 | Escalabilidad |
-| n4_b1000 | 4 | 1000 | Escalabilidad |
-| n8_b1000 | 8 | 1000 | Escalabilidad (optimo) |
-| n16_b1000 | 16 | 1000 | Over-subscription |
-| n8_b100 | 8 | 100 | Efecto batch chico |
-| n8_b5000 | 8 | 5000 | Efecto batch grande |
-
-## Como regenerar
+1. Asegurate de tener `data/dataset_final_1M.csv` (ver `data/README.md`).
+2. Desde la raiz del repo, ejecuta:
 
 ```powershell
 .\run_benchmarks.ps1
 ```
 
-Requiere el dataset completo en `data/dataset_final_1M.csv`. Genera 35 archivos en `raw/`.
+Genera los 35 JSONs en `resultados/raw/`.
 
-## Resumen de resultados (media recortada)
+## Convencion de nombres
 
-Media recortada: de las 5 repeticiones, se eliminan la mas rapida y la mas lenta, y se promedian las 3 restantes.
+`raw/n{W}_b{B}_run{R}.json`
 
-| Config | Media recortada (ms) | Speedup vs n1 |
+- **W** = numero de workers por etapa (1, 2, 4, 8, 16)
+- **B** = batch size en documentos (100, 1000, 5000)
+- **R** = numero de repeticion (1 a 5)
+
+Ejemplo: `n8_b1000_run3.json` = 8 workers, batch=1000, tercera repeticion.
+
+## Configuraciones probadas
+
+| Configuracion | Variable | Repeticiones |
 |---|---|---|
-| n1_b1000 | 8309 | 1.00x |
-| n2_b1000 | 5364 | 1.55x |
-| n4_b1000 | 3724 | 2.23x |
-| n8_b1000 | 3123 | **2.66x** |
-| n16_b1000 | 3186 | 2.61x |
-| n8_b100 | 3656 | 2.27x |
-| n8_b5000 | 3417 | 2.43x |
+| N = {1, 2, 4, 8, 16}, batch=1000 | Scalability vs N workers | 5 |
+| N=8, batch = {100, 1000, 5000} | Efecto del batch size | 5 |
+
+## Metricas registradas en cada JSON
+
+Cada archivo JSON contiene 21 campos. Los mas relevantes para el analisis:
+
+| Campo | Descripcion |
+|---|---|
+| `elapsed_total_ms` | Tiempo total de ejecucion del pipeline (metrica principal) |
+| `elapsed_read_ms` | Tiempo en lectura del CSV |
+| `elapsed_clean_ms` | Tiempo de la etapa de limpieza |
+| `elapsed_token_ms` | Tiempo de la etapa de tokenizacion |
+| `elapsed_lemma_ms` | Tiempo de la etapa de lematizacion |
+| `peak_memory_mb` | Memoria pico durante la ejecucion |
+| `mutex_contention_ms` | Tiempo acumulado esperando el mutex global |
+| `tokens_globales` | Contador global protegido con `sync.Mutex` |
+| `docs_procesados` | Total de documentos procesados (debe == 1,000,000) |
+| `docs_reales` | Documentos reales del Diario El Peruano |
+| `docs_sinteticos` | Documentos generados sinteticamente |
+
+Los contadores `tokens_globales`, `docs_procesados`, `docs_reales` y `docs_sinteticos` son variables protegidas por `sync.Mutex` que mapean directamente a las variables del modelo Promela del PC1 y se usan para verificar las aserciones del `proctype Coordinador`.
