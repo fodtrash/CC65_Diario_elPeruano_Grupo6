@@ -3,15 +3,15 @@
 // Uso:
 //
 //	go run . [flags]
-//	go run . -csv ../../data/sample/dataset_sample_500_rows.csv -n 500
+//	go run . -input ../../data/sample/dataset_sample_500_rows.csv -n 500
 //	go run . -nreal 244777 -nsint 755223          # corpus completo generado
 //
 // Flags:
 //
 //	-input ruta al CSV del corpus (default: ../../data/sample/dataset_sample_500_rows.csv)
 //	-n     límite de documentos a leer del CSV (0 = sin límite)
-//	-nreal documentos REAL  para corpus generado (ignorado si -csv existe)
-//	-nsint documentos SINT  para corpus generado (ignorado si -csv existe)
+//	-nreal documentos REAL  para corpus generado (ignorado si -input existe)
+//	-nsint documentos SINT  para corpus generado (ignorado si -input existe)
 package main
 
 import (
