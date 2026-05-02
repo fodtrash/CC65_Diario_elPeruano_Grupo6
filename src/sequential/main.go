@@ -41,8 +41,6 @@ func main() {
 	nDocs := *nReal + *nSint
 
 	fmt.Println(banner())
-	fmt.Printf("  Configuración  : nReal=%d | nSint=%d | nDocs=%d\n",
-		*nReal, *nSint, nDocs)
 	fmt.Printf("  Corpus CSV     : %s\n", *csvPath)
 	if *nLimit > 0 {
 		fmt.Printf("  Límite lectura : %d documentos\n", *nLimit)

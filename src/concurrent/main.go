@@ -32,24 +32,24 @@ type Document struct {
 
 // Metrics contiene las métricas de ejecución del pipeline.
 type Metrics struct {
-	Version         string  `json:"version"`
-	InputFile       string  `json:"input_file"`
-	WorkersToken    int     `json:"workers_token"`
-	WorkersLemma    int     `json:"workers_lemma"`
-	BatchSize       int     `json:"batch_size"`
-	TotalDocs       int64   `json:"total_docs"`
-	TotalTokens     int64   `json:"total_tokens"`
-	TotalLemmasUniq int     `json:"total_lemmas_unique"`
-	ElapsedTotalMs  int64   `json:"elapsed_total_ms"`
-	ElapsedReadMs   int64   `json:"elapsed_read_ms"`
-	ElapsedTokenMs  int64   `json:"elapsed_token_ms"`
-	ElapsedLemmaMs  int64   `json:"elapsed_lemma_ms"`
-	PeakMemoryMB     float64 `json:"peak_memory_mb"`
-	NumCPUs          int     `json:"num_cpus"`
-	TokensGlobales   int64   `json:"tokens_globales"`
-	DocsProcesados   int64   `json:"docs_procesados"`
-	DocsReales       int64   `json:"docs_reales"`
-	DocsSinteticos   int64   `json:"docs_sinteticos"`
+	Version           string  `json:"version"`
+	InputFile         string  `json:"input_file"`
+	WorkersToken      int     `json:"workers_token"`
+	WorkersLemma      int     `json:"workers_lemma"`
+	BatchSize         int     `json:"batch_size"`
+	TotalDocs         int64   `json:"total_docs"`
+	TotalTokens       int64   `json:"total_tokens"`
+	TotalLemmasUniq   int     `json:"total_lemmas_unique"`
+	ElapsedTotalMs    int64   `json:"elapsed_total_ms"`
+	ElapsedReadMs     int64   `json:"elapsed_read_ms"`
+	ElapsedTokenMs    int64   `json:"elapsed_token_ms"`
+	ElapsedLemmaMs    int64   `json:"elapsed_lemma_ms"`
+	PeakMemoryMB      float64 `json:"peak_memory_mb"`
+	NumCPUs           int     `json:"num_cpus"`
+	TokensGlobales    int64   `json:"tokens_globales"`
+	DocsProcesados    int64   `json:"docs_procesados"`
+	DocsReales        int64   `json:"docs_reales"`
+	DocsSinteticos    int64   `json:"docs_sinteticos"`
 	MutexContentionMs float64 `json:"mutex_contention_ms"`
 }
 
@@ -60,8 +60,10 @@ type localResult struct {
 }
 
 // GlobalCounters espejea las variables globales del modelo Promela:
-//   Promela: int docs_procesados, docs_reales, docs_sinteticos, tokens_globales
-//   Promela: chan mutex = [1] of { bit }  →  Go: sync.Mutex
+//
+//	Promela: int docs_procesados, docs_reales, docs_sinteticos, tokens_globales
+//	Promela: chan mutex = [1] of { bit }  →  Go: sync.Mutex
+//
 // Los workers actualizan estos contadores bajo mutex, tal como el Promela
 // usa mutex?_ / mutex!1 para proteger las actualizaciones.
 type GlobalCounters struct {
