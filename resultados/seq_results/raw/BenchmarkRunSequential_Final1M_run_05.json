@@ -1,0 +1,14 @@
+{
+  "timestamp": "20260501-160204",
+  "run_id": 5,
+  "dataset": "final-dataset-1m",
+  "name": "BenchmarkRunSequential_Final1M",
+  "workers": 1,
+  "corpus_docs": 1000000,
+  "total_ops": 1,
+  "total_docs": 1000000,
+  "elapsed_nanos": 2932727800,
+  "ns_per_op": 2932727800,
+  "docs_per_sec": 340979.47992309416,
+  "ns_per_doc": 2932.7278
+}
