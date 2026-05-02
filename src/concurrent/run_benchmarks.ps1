@@ -1,7 +1,7 @@
 # Benchmark runner para PC2 - Pipeline NLP Concurrente
 # Corre 5 repeticiones por configuracion para calcular media recortada
 
-$rawDir = "resultados/raw"
+$rawDir = "resultados/con_results/raw"
 if (-not (Test-Path $rawDir)) {
     New-Item -ItemType Directory -Path $rawDir | Out-Null
 }

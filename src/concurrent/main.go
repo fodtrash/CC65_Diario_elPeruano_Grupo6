@@ -82,7 +82,7 @@ func main() {
 	workersLemma := flag.Int("workers-lemma", 4, "Número de workers de lematización")
 	batchSize := flag.Int("batch-size", 1000, "Documentos por lote")
 	bufferSize := flag.Int("buffer", 8, "Tamaño del buffer de canales")
-	outputFile := flag.String("output", "resultados/concurrent_metrics.json", "Ruta del JSON de métricas")
+	outputFile := flag.String("output", "resultados/con_results/concurrent_metrics.json", "Ruta del JSON de métricas")
 	flag.Parse()
 
 	log.Printf("Pipeline concurrente: input=%s workers(T=%d,L=%d) batch=%d buffer=%d",
