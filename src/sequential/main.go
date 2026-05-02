@@ -26,8 +26,8 @@ import (
 
 const (
 	defaultCSV   = "../../data/sample/dataset_sample_500_rows.csv"
-	defaultNReal = 244777
-	defaultNSint = 755223
+	defaultNReal = 244779
+	defaultNSint = 755221
 )
 
 func main() {
