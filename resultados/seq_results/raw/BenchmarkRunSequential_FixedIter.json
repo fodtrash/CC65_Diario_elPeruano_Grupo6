@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260501-151027",
+  "name": "BenchmarkRunSequential_FixedIter",
+  "workers": 1,
+  "corpus_docs": 500,
+  "total_ops": 7992,
+  "total_docs": 3996000,
+  "elapsed_nanos": 8328845900,
+  "ns_per_op": 1042147.8853853854,
+  "docs_per_sec": 479778.35680691374,
+  "ns_per_doc": 2084.2957707707706
+}

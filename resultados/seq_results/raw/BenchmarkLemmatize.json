@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260501-151027",
+  "name": "BenchmarkLemmatize",
+  "workers": 1,
+  "corpus_docs": 10796130,
+  "total_ops": 10796130,
+  "total_docs": 116556422976900,
+  "elapsed_nanos": 8279111100,
+  "ns_per_op": 766.8591523073546,
+  "docs_per_sec": 14078374063237.297,
+  "ns_per_doc": 0.00007103092981534629
+}

@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260501-151027",
+  "name": "BenchmarkApplySuffixRules",
+  "workers": 1,
+  "corpus_docs": 7,
+  "total_ops": 26697652,
+  "total_docs": 186883564,
+  "elapsed_nanos": 8377097000,
+  "ns_per_op": 313.77654484371885,
+  "docs_per_sec": 22308869.52842972,
+  "ns_per_doc": 44.825220691959835
+}
