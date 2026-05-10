@@ -1,12 +1,14 @@
 {
-  "timestamp": "20260501-151027",
+  "timestamp": "20260510-152403",
+  "dataset": "synthetic-stage",
   "name": "BenchmarkApplySuffixRules",
   "workers": 1,
   "corpus_docs": 7,
-  "total_ops": 26697652,
-  "total_docs": 186883564,
-  "elapsed_nanos": 8377097000,
-  "ns_per_op": 313.77654484371885,
-  "docs_per_sec": 22308869.52842972,
-  "ns_per_doc": 44.825220691959835
+  "total_ops": 2576806,
+  "total_docs": 18037642,
+  "elapsed_nanos": 1202266100,
+  "ns_per_op": 466.57222157973865,
+  "docs_per_sec": 15003036.349440442,
+  "ns_per_doc": 66.65317451139123,
+  "peak_memory_mb": 42.77562713623047
 }

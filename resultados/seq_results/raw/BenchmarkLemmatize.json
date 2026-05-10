@@ -1,12 +1,14 @@
 {
-  "timestamp": "20260501-151027",
+  "timestamp": "20260510-152403",
+  "dataset": "synthetic-stage",
   "name": "BenchmarkLemmatize",
   "workers": 1,
-  "corpus_docs": 10796130,
-  "total_ops": 10796130,
-  "total_docs": 116556422976900,
-  "elapsed_nanos": 8279111100,
-  "ns_per_op": 766.8591523073546,
-  "docs_per_sec": 14078374063237.297,
-  "ns_per_doc": 0.00007103092981534629
+  "corpus_docs": 887179,
+  "total_ops": 887179,
+  "total_docs": 787086578041,
+  "elapsed_nanos": 1094245400,
+  "ns_per_op": 1233.3986715195017,
+  "docs_per_sec": 719296218234.9591,
+  "ns_per_doc": 0.0013902478209239643,
+  "peak_memory_mb": 42.77562713623047
 }

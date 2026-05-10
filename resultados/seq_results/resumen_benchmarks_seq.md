@@ -4,21 +4,21 @@ Esta tabla resume el escenario comparable contra el pipeline concurrente: proces
 
 ## Estadísticas por configuración
 
-| Configuración | Mediciones (s) | Media | Media recortada | StdDev | CV% | Throughput recortado (docs/s) |
-|:---|:---|---:|---:|---:|---:|---:|
-| Final 1M, 1 worker | 2.912, 3.382, 3.065, 2.917, 2.933 | 3.042 | **2.972** | 0.200 | 6.6% | 336,518.25 |
+| Configuración | Mediciones (s) | Media | Media recortada | StdDev | CV% | Throughput recortado (docs/s) | Peak Memory recortado (MB) |
+|:---|:---|---:|---:|---:|---:|---:|---:|
+| Final 1M, 1 worker | 2.990, 2.903, 2.896, 2.879, 2.925 | 2.918 | **2.908** | 0.043 | 1.5% | 344,119.35 | 263.63 |
 
 Media recortada: se eliminan el valor mínimo y el máximo de las cinco mediciones y se promedian los tres valores centrales.
 
 ## Resultados individuales
 
-| Run | Archivo JSON | Tiempo total (s) | Throughput (docs/s) | ns/doc |
-|:---:|:---|---:|---:|---:|
-| 1 | [BenchmarkRunSequential_Final1M_run_01.json](raw/BenchmarkRunSequential_Final1M_run_01.json) | 2.912 | 343,350.78 | 2,912.47 |
-| 2 | [BenchmarkRunSequential_Final1M_run_02.json](raw/BenchmarkRunSequential_Final1M_run_02.json) | 3.382 | 295,655.89 | 3,382.31 |
-| 3 | [BenchmarkRunSequential_Final1M_run_03.json](raw/BenchmarkRunSequential_Final1M_run_03.json) | 3.065 | 326,289.96 | 3,064.76 |
-| 4 | [BenchmarkRunSequential_Final1M_run_04.json](raw/BenchmarkRunSequential_Final1M_run_04.json) | 2.917 | 342,778.57 | 2,917.34 |
-| 5 | [BenchmarkRunSequential_Final1M_run_05.json](raw/BenchmarkRunSequential_Final1M_run_05.json) | 2.933 | 340,979.48 | 2,932.73 |
+| Run | Archivo JSON | Tiempo total (s) | Throughput (docs/s) | ns/doc | Peak Memory (MB) |
+|:---:|:---|---:|---:|---:|---:|
+| 1 | [BenchmarkRunSequential_Final1M_run_01.json](raw/BenchmarkRunSequential_Final1M_run_01.json) | 2.990 | 334,469.04 | 2,989.58 | 260.35 |
+| 2 | [BenchmarkRunSequential_Final1M_run_02.json](raw/BenchmarkRunSequential_Final1M_run_02.json) | 2.903 | 344,614.73 | 2,902.81 | 260.87 |
+| 3 | [BenchmarkRunSequential_Final1M_run_03.json](raw/BenchmarkRunSequential_Final1M_run_03.json) | 2.896 | 345,365.44 | 2,896.12 | 264.87 |
+| 4 | [BenchmarkRunSequential_Final1M_run_04.json](raw/BenchmarkRunSequential_Final1M_run_04.json) | 2.879 | 346,985.28 | 2,879.19 | 265.14 |
+| 5 | [BenchmarkRunSequential_Final1M_run_05.json](raw/BenchmarkRunSequential_Final1M_run_05.json) | 2.925 | 342,019.62 | 2,924.56 | 265.14 |
 
 ## Comparación preliminar con la referencia concurrente
 

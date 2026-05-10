@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -179,6 +180,7 @@ type benchmarkResult struct {
 	NsPerOp      float64 `json:"ns_per_op"`
 	DocsPerSec   float64 `json:"docs_per_sec"`
 	TimePerDoc   float64 `json:"ns_per_doc"`
+	PeakMemoryMB float64 `json:"peak_memory_mb"`
 }
 
 func writeBenchmarkArtifact(name, dataset string, nWorkers, corpusDocs, totalOps int, elapsed time.Duration, runID ...uint64) {
@@ -186,6 +188,24 @@ func writeBenchmarkArtifact(name, dataset string, nWorkers, corpusDocs, totalOps
 	if len(runID) > 0 {
 		currentRunID = runID[0]
 	}
+
+	// Medir memoria usando runtime.MemStats
+	var ms runtime.MemStats
+	runtime.ReadMemStats(&ms)
+	peakMemoryMB := float64(ms.Sys) / (1024 * 1024)
+
+	// Evitar división por cero
+	var nsPerOp, docsPerSec, timePerDoc float64
+	if totalOps > 0 {
+		nsPerOp = float64(elapsed.Nanoseconds()) / float64(totalOps)
+	}
+	if elapsed.Seconds() > 0 {
+		docsPerSec = float64(corpusDocs*totalOps) / elapsed.Seconds()
+	}
+	if corpusDocs*totalOps > 0 {
+		timePerDoc = float64(elapsed.Nanoseconds()) / float64(corpusDocs*totalOps)
+	}
+
 	metrics := benchmarkResult{
 		Timestamp:    benchmarkRunStamp,
 		RunID:        currentRunID,
@@ -196,9 +216,10 @@ func writeBenchmarkArtifact(name, dataset string, nWorkers, corpusDocs, totalOps
 		TotalOps:     totalOps,
 		TotalDocs:    corpusDocs * totalOps,
 		ElapsedNanos: elapsed.Nanoseconds(),
-		NsPerOp:      float64(elapsed.Nanoseconds()) / float64(totalOps),
-		DocsPerSec:   float64(corpusDocs*totalOps) / elapsed.Seconds(),
-		TimePerDoc:   float64(elapsed.Nanoseconds()) / float64(corpusDocs*totalOps),
+		NsPerOp:      nsPerOp,
+		DocsPerSec:   docsPerSec,
+		TimePerDoc:   timePerDoc,
+		PeakMemoryMB: peakMemoryMB,
 	}
 
 	if err := persistBenchmarkResult(metrics); err != nil {
@@ -237,6 +258,7 @@ func printBenchmarkReport(metrics benchmarkResult) {
 	fmt.Printf("  Ns/op:          %.2f\n", metrics.NsPerOp)
 	fmt.Printf("  Throughput:     %.2f docs/s\n", metrics.DocsPerSec)
 	fmt.Printf("  Tiempo/doc:     %.2f ns\n", metrics.TimePerDoc)
+	fmt.Printf("  Peak Memory:    %.2f MB\n", metrics.PeakMemoryMB)
 	fmt.Printf("%s\n\n", sep)
 }
 

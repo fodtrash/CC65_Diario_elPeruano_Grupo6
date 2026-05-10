@@ -1,12 +1,14 @@
 {
-  "timestamp": "20260501-151027",
+  "timestamp": "20260510-152403",
+  "dataset": "synthetic-stage",
   "name": "BenchmarkTokenize",
   "workers": 1,
-  "corpus_docs": 5042828,
-  "total_ops": 5042828,
-  "total_docs": 25430114237584,
-  "elapsed_nanos": 8318588900,
-  "ns_per_op": 1649.5880684409622,
-  "docs_per_sec": 3057022596414.6396,
-  "ns_per_doc": 0.0003271156716907581
+  "corpus_docs": 550750,
+  "total_ops": 550750,
+  "total_docs": 303325562500,
+  "elapsed_nanos": 1306364800,
+  "ns_per_op": 2371.9742169768497,
+  "docs_per_sec": 232190550832.3556,
+  "ns_per_doc": 0.004306807475218974,
+  "peak_memory_mb": 42.77562713623047
 }
