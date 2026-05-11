@@ -13,7 +13,11 @@ import (
 	"sync/atomic"
 	"time"
 
+<<<<<<< HEAD
 	"github.com/josel/cc65_pc2/CC65_Diario_elPeruano_Grupo6/src/internal/nlp"
+=======
+	"github.com/josel/cc65_pc2/src/internal/nlp"
+>>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 )
 
 // Document representa un registro del dataset del Diario El Peruano.
@@ -32,6 +36,7 @@ type Document struct {
 
 // Metrics contiene las métricas de ejecución del pipeline.
 type Metrics struct {
+<<<<<<< HEAD
 	Version           string  `json:"version"`
 	InputFile         string  `json:"input_file"`
 	WorkersToken      int     `json:"workers_token"`
@@ -50,6 +55,26 @@ type Metrics struct {
 	DocsProcesados    int64   `json:"docs_procesados"`
 	DocsReales        int64   `json:"docs_reales"`
 	DocsSinteticos    int64   `json:"docs_sinteticos"`
+=======
+	Version         string  `json:"version"`
+	InputFile       string  `json:"input_file"`
+	WorkersToken    int     `json:"workers_token"`
+	WorkersLemma    int     `json:"workers_lemma"`
+	BatchSize       int     `json:"batch_size"`
+	TotalDocs       int64   `json:"total_docs"`
+	TotalTokens     int64   `json:"total_tokens"`
+	TotalLemmasUniq int     `json:"total_lemmas_unique"`
+	ElapsedTotalMs  int64   `json:"elapsed_total_ms"`
+	ElapsedReadMs   int64   `json:"elapsed_read_ms"`
+	ElapsedTokenMs  int64   `json:"elapsed_token_ms"`
+	ElapsedLemmaMs  int64   `json:"elapsed_lemma_ms"`
+	PeakMemoryMB     float64 `json:"peak_memory_mb"`
+	NumCPUs          int     `json:"num_cpus"`
+	TokensGlobales   int64   `json:"tokens_globales"`
+	DocsProcesados   int64   `json:"docs_procesados"`
+	DocsReales       int64   `json:"docs_reales"`
+	DocsSinteticos   int64   `json:"docs_sinteticos"`
+>>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 	MutexContentionMs float64 `json:"mutex_contention_ms"`
 }
 
@@ -60,10 +85,15 @@ type localResult struct {
 }
 
 // GlobalCounters espejea las variables globales del modelo Promela:
+<<<<<<< HEAD
 //
 //	Promela: int docs_procesados, docs_reales, docs_sinteticos, tokens_globales
 //	Promela: chan mutex = [1] of { bit }  →  Go: sync.Mutex
 //
+=======
+//   Promela: int docs_procesados, docs_reales, docs_sinteticos, tokens_globales
+//   Promela: chan mutex = [1] of { bit }  →  Go: sync.Mutex
+>>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 // Los workers actualizan estos contadores bajo mutex, tal como el Promela
 // usa mutex?_ / mutex!1 para proteger las actualizaciones.
 type GlobalCounters struct {
@@ -82,7 +112,11 @@ func main() {
 	workersLemma := flag.Int("workers-lemma", 4, "Número de workers de lematización")
 	batchSize := flag.Int("batch-size", 1000, "Documentos por lote")
 	bufferSize := flag.Int("buffer", 8, "Tamaño del buffer de canales")
+<<<<<<< HEAD
 	outputFile := flag.String("output", "resultados/con_results/concurrent_metrics.json", "Ruta del JSON de métricas")
+=======
+	outputFile := flag.String("output", "resultados/concurrent_metrics.json", "Ruta del JSON de métricas")
+>>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 	flag.Parse()
 
 	log.Printf("Pipeline concurrente: input=%s workers(T=%d,L=%d) batch=%d buffer=%d",
