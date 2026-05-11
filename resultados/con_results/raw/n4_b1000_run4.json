@@ -6,16 +6,16 @@
   "batch_size": 1000,
   "total_docs": 1000000,
   "total_tokens": 8847793,
-  "total_lemmas_unique": 45321,
-  "elapsed_total_ms": 5298,
-  "elapsed_read_ms": 5198,
-  "elapsed_token_ms": 5242,
-  "elapsed_lemma_ms": 5222,
-  "peak_memory_mb": 65.64453125,
+  "total_lemmas_unique": 38201,
+  "elapsed_total_ms": 5348,
+  "elapsed_read_ms": 5283,
+  "elapsed_token_ms": 5308,
+  "elapsed_lemma_ms": 5297,
+  "peak_memory_mb": 106.73828125,
   "num_cpus": 8,
   "tokens_globales": 8847793,
   "docs_procesados": 1000000,
   "docs_reales": 244779,
   "docs_sinteticos": 755221,
-  "mutex_contention_ms": 0.8093
+  "mutex_contention_ms": 0
 }
