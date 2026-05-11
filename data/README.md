@@ -1,34 +1,17 @@
-# Data
+# Datos del proyecto
 
-## Dataset completo
+## Estructura
 
-El dataset completo (~1,000,000 registros) **no se incluye en este repositorio** debido a su tamaño.
+- **`dataset_final_1M.csv`** — Dataset completo de 1,000,000 registros
+  (244,777 reales del Diario Oficial El Peruano + 755,223 sintéticos).
+  Este archivo **NO está en Git** por su tamaño (~200 MB).
+  Cómo obtenerlo: ejecutar el notebook
+  `notebooks/consolidacion_dataset_aumentado.ipynb` en Google Colab y
+  descargar el CSV resultante a esta carpeta.
 
-## ¿Cómo obtenerlo?
-
-El dataset se genera ejecutando el notebook de limpieza y aumentación de datos ubicado en:
-
-```
-notebooks/consolidacion_dataset_aumentado.ipynb
-```
-
-### Pasos
-
-1. Asegúrate de tener **Python 3** y **Jupyter Notebook** instalados.
-2. Instala las dependencias necesarias:
-   ```bash
-   pip install pandas numpy matplotlib jupyter
-   ```
-3. Abre el notebook:
-   ```bash
-   jupyter notebook notebooks/consolidacion_dataset_aumentado.ipynb
-   ```
-4. Ejecuta todas las celdas en orden (**Run All**).
-5. Al finalizar, se generará el archivo `dataset_final_1M.csv` con aproximadamente **1,000,000 de registros**.
-
-## Muestra del dataset
-
-En la carpeta `data/sample/` se incluye una muestra pequeña del dataset para pruebas rápidas sin necesidad de generar el completo.
+- **`sample/sample_500.csv`** — Sample de 500 registros para tests rápidos.
+  Sí está en Git. Útil para correr `go test` y verificaciones básicas
+  sin descargar el dataset grande.
 
 ## Columnas del dataset
 
@@ -41,3 +24,17 @@ En la carpeta `data/sample/` se incluye una muestra pequeña del dataset para pr
 | SUMILLA            | Título o resumen del dispositivo legal           |
 | FECHA_CORTE        | Fecha de corte del registro (YYYYMMDD)           |
 | ORIGEN             | Indica si el registro es REAL o SINTETICO        |
+
+## Uso
+
+Para correr el pipeline concurrente sobre el dataset completo:
+
+```bash
+go run ./src/concurrent/ -input data/dataset_final_1M.csv
+```
+
+Para correr sobre el sample (rápido, para tests):
+
+```bash
+go run ./src/concurrent/ -input data/sample/sample_500.csv
+```

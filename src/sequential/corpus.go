@@ -120,8 +120,16 @@ func parseCSV(r io.Reader, limit int) ([]Document, error) {
 		doc.Sumilla = strings.TrimSpace(record[sumillaCol])
 
 		if hasOrigen {
-			v, _ := strconv.Atoi(strings.TrimSpace(record[origenCol]))
-			doc.Origen = v
+			origenStr := strings.ToUpper(strings.TrimSpace(record[origenCol]))
+			switch origenStr {
+			case "REAL":
+				doc.Origen = OrigenReal
+			case "SINTETICO":
+				doc.Origen = OrigenSintetico
+			default:
+				// Valor desconocido → por defecto REAL
+				doc.Origen = OrigenReal
+			}
 		} else {
 			// Sin columna ORIGEN: asignación por posición (igual que Promela)
 			if rowNum < len(docs) { // placeholder; se usa rowNum

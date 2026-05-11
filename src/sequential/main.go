@@ -3,15 +3,15 @@
 // Uso:
 //
 //	go run . [flags]
-//	go run . -csv ../../data/sample/dataset_sample_500_rows.csv -n 500
+//	go run . -input ../../data/sample/dataset_sample_500_rows.csv -n 500
 //	go run . -nreal 244777 -nsint 755223          # corpus completo generado
 //
 // Flags:
 //
 //	-input ruta al CSV del corpus (default: ../../data/sample/dataset_sample_500_rows.csv)
 //	-n     límite de documentos a leer del CSV (0 = sin límite)
-//	-nreal documentos REAL  para corpus generado (ignorado si -csv existe)
-//	-nsint documentos SINT  para corpus generado (ignorado si -csv existe)
+//	-nreal documentos REAL  para corpus generado (ignorado si -input existe)
+//	-nsint documentos SINT  para corpus generado (ignorado si -input existe)
 package main
 
 import (
@@ -26,8 +26,8 @@ import (
 
 const (
 	defaultCSV   = "../../data/sample/dataset_sample_500_rows.csv"
-	defaultNReal = 244777
-	defaultNSint = 755223
+	defaultNReal = 244779
+	defaultNSint = 755221
 )
 
 func main() {
@@ -41,8 +41,6 @@ func main() {
 	nDocs := *nReal + *nSint
 
 	fmt.Println(banner())
-	fmt.Printf("  Configuración  : nReal=%d | nSint=%d | nDocs=%d\n",
-		*nReal, *nSint, nDocs)
 	fmt.Printf("  Corpus CSV     : %s\n", *csvPath)
 	if *nLimit > 0 {
 		fmt.Printf("  Límite lectura : %d documentos\n", *nLimit)
