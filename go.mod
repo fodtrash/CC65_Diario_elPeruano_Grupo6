@@ -1,3 +1,3 @@
-module github.com/josel/cc65_pc2
+module github.com/josel/cc65_pc2/CC65_Diario_elPeruano_Grupo6/src
 
-go 1.22
+go 1.20
