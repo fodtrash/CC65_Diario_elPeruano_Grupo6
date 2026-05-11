@@ -1,0 +1,29 @@
+# Datasets pesados (fuera de sample/)
+data/*.csv
+
+# Resultados ad-hoc (regenerables, no van al repo)
+resultados/*.json
+resultados/con_results/bench_*.json
+
+# Excepcion: los datos raw del benchmark SI van al repo (evidencia experimental)
+!resultados/raw/
+
+# PDFs del curso (material privado, referencia local)
+*.pdf
+
+# Binarios y artefactos de Go
+*.exe
+*.test
+*.out
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+NUL

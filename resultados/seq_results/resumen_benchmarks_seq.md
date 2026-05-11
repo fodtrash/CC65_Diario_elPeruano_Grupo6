@@ -1,29 +1,22 @@
 # Tabla Maestra de Estadísticas — Pipeline Secuencial
 
-Esta tabla resume el escenario comparable contra el pipeline concurrente: procesamiento end-to-end del dataset final de 1,000,000 registros. Las mediciones provienen de cinco ejecuciones controladas del benchmark `BenchmarkRunSequential_Final1M`, ejecutado como `go test -bench="BenchmarkRunSequential_Final1M" -benchmem -run="^$" -benchtime=1x -count=5`.
+Esta tabla resume el procesamiento end-to-end del dataset final de 1,000,000 registros, utilizando los datos de la ejecución controlada del 11/05/2026.
 
 ## Estadísticas por configuración
 
-| Configuración | Mediciones (s) | Media | Media recortada | StdDev | CV% | Throughput recortado (docs/s) |
+| Configuración | Mediciones (s) | Media | Media recortada | CV% | Throughput recortado (docs/s) | Peak Memory (MB) |
 |:---|:---|---:|---:|---:|---:|---:|
-| Final 1M, 1 worker | 2.912, 3.382, 3.065, 2.917, 2.933 | 3.042 | **2.972** | 0.200 | 6.6% | 336,518.25 |
+| Final 1M, 1 worker | 527.87, 538.05, 558.77, 685.16, 665.05 | 594.981 | **587.291** | 11.5% | 1,702.73 | ~285.08 |
 
-Media recortada: se eliminan el valor mínimo y el máximo de las cinco mediciones y se promedian los tres valores centrales.
+* **Media recortada**: Se calculó eliminando el valor más bajo (527.87 s) y el más alto (685.16 s) para mitigar el ruido del sistema operativo.
+* **Peak Memory**: Consumo máximo de RAM registrado durante la ejecución del benchmark.
 
-## Resultados individuales
+## Resultados individuales (Actualizados)
 
-| Run | Archivo JSON | Tiempo total (s) | Throughput (docs/s) | ns/doc |
-|:---:|:---|---:|---:|---:|
-| 1 | [BenchmarkRunSequential_Final1M_run_01.json](raw/BenchmarkRunSequential_Final1M_run_01.json) | 2.912 | 343,350.78 | 2,912.47 |
-| 2 | [BenchmarkRunSequential_Final1M_run_02.json](raw/BenchmarkRunSequential_Final1M_run_02.json) | 3.382 | 295,655.89 | 3,382.31 |
-| 3 | [BenchmarkRunSequential_Final1M_run_03.json](raw/BenchmarkRunSequential_Final1M_run_03.json) | 3.065 | 326,289.96 | 3,064.76 |
-| 4 | [BenchmarkRunSequential_Final1M_run_04.json](raw/BenchmarkRunSequential_Final1M_run_04.json) | 2.917 | 342,778.57 | 2,917.34 |
-| 5 | [BenchmarkRunSequential_Final1M_run_05.json](raw/BenchmarkRunSequential_Final1M_run_05.json) | 2.933 | 340,979.48 | 2,932.73 |
-
-## Comparación preliminar con la referencia concurrente
-
-Usando la media recortada secuencial de 2.972 s como línea base, la comparación con la tabla concurrente proporcionada por el colega puede expresarse como $T_{seq} / T_{conc}$. Bajo esa convención, el secuencial resulta menor que la configuración concurrente de 1 worker y batch=1000 (9.007 s), con una razón aproximada de 0.33x, y también menor que la mejor configuración concurrente reportada (4.670 s), con una razón aproximada de 0.64x. Por tanto, en las mediciones actuales el pipeline secuencial se comporta como control experimental más rápido que la versión concurrente reportada, lo que obliga a interpretar el paralelismo como un costo adicional si no se igualan exactamente el trabajo por documento y el modelo de sincronización.
-
-## Observación metodológica
-
-Los benchmarks de tokenización, lematización y reglas de sufijo se conservan como métricas auxiliares de diagnóstico, pero no deben usarse como base principal para comparar speedup con la versión concurrente. La tabla principal de este documento está centrada en la misma carga de 1M registros para que la comparación sea lo más iso-funcional posible.
+| Run | Tiempo total (s) | Throughput (docs/s) | ns/doc | Peak Memory (MB) |
+|:---:|---:|---:|---:|---:|
+| 1 | 527.873 | 1,894.40 | 527,872.57 | 283.97 |
+| 2 | 538.052 | 1,854.71 | 538,052.04 | 284.14 |
+| 3 | 558.769 | 1,789.47 | 558,769.12 | 285.73 |
+| 4 | 685.165 | 1,478.47 | 685,164.71 | 287.42 |
+| 5 | 665.050 | 1,503.56 | 665,049.71 | 284.14 |
