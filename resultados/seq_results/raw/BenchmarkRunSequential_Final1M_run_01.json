@@ -1,5 +1,5 @@
 {
-  "timestamp": "20260510-152510",
+  "timestamp": "20260510-193651",
   "run_id": 1,
   "dataset": "final-dataset-1m",
   "name": "BenchmarkRunSequential_Final1M",
@@ -7,9 +7,9 @@
   "corpus_docs": 1000000,
   "total_ops": 1,
   "total_docs": 1000000,
-  "elapsed_nanos": 2989576600,
-  "ns_per_op": 2989576600,
-  "docs_per_sec": 334495.52689166757,
-  "ns_per_doc": 2989.5766,
-  "peak_memory_mb": 260.34984588623047
+  "elapsed_nanos": 3010098300,
+  "ns_per_op": 3010098300,
+  "docs_per_sec": 332215.0642057105,
+  "ns_per_doc": 3010.0983,
+  "peak_memory_mb": 459.55492401123047
 }
