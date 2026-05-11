@@ -1,93 +1,35 @@
 # Parrafos pre-redactados para el informe del PC2
 
-Estos parrafos estan escritos en un registro tecnico-academico apropiado
-para el informe. Ricardo puede usarlos literalmente o adaptarlos segun
-su estilo. Todos los datos numericos provienen de los 35 JSONs en
-`resultados/raw/`.
+Estos parrafos estan escritos en un registro tecnico-academico para el informe.
+Todos los datos provienen de los 35 JSON en `resultados/con_results/raw/`,
+generados con la corrida mas reciente sobre `dataset_final_1M.csv`.
 
 ---
 
 ## Sobre el speedup y la metodologia estadistica
 
-Para garantizar la robustez estadistica de las mediciones, cada
-configuracion fue ejecutada 5 veces y se calculo la media recortada
-(descartando los valores minimo y maximo de las mediciones individuales)
-sobre los tres valores centrales. Esta tecnica reduce el sesgo introducido
-por outliers temporales asociados a la actividad del sistema operativo
-durante las pruebas. Los resultados muestran un speedup creciente desde
-1.00x (N=1, baseline = 9,007 ms) hasta un maximo de 1.93x (N=8 con
-batch=5000, 4,670 ms), con un coeficiente de variacion entre 1.8% y
-14.8% segun la configuracion. La eficiencia paralela decae de 82.0%
-(N=2) a 23.1% (N=8) y 11.8% (N=16), lo que evidencia el comportamiento
-sub-lineal predicho por la Ley de Amdahl. Las configuraciones con mayor
-numero de workers presentan mediciones mas estables (CV < 5%) que las
-de menor paralelismo, lo que sugiere que la concurrencia reduce la
-variabilidad del rendimiento al amortizar interferencias del sistema
-entre multiples nucleos.
+Para controlar la variabilidad experimental, cada configuracion se ejecuto cinco veces y se uso media recortada (sin minimo ni maximo) como estimador robusto. El baseline concurrente `N=1, batch=1000` obtuvo **5,434 ms** (CV 0.7%), mientras que el mejor resultado para la familia `batch=1000` fue **N=4** con **2,377 ms** (speedup **2.29x**, eficiencia 57.2%). Con mayor paralelismo se observa rendimiento decreciente: `N=8` marca 2,494 ms (2.18x; 27.2%) y `N=16` sube a 3,012 ms (1.80x; 11.3%). Esta curva confirma que aumentar workers no garantiza mejoras lineales cuando la carga util paralelizable ya fue reducida por memoizacion y la etapa mas lenta del pipeline pasa a dominar el wall-clock.
 
-## Sobre la scalability y el techo de Amdahl
+## Sobre el comportamiento por etapas del pipeline
 
-Las pruebas con N=16 workers (sobreasignacion respecto a los 8 nucleos
-logicos disponibles) muestran un rendimiento practicamente identico al
-de N=8: 4,790 ms vs 4,878 ms respectivamente (diferencia < 2%). El
-consumo de memoria, en cambio, crece de 113 MB a 146 MB. Este resultado
-confirma empiricamente que el sweet spot de paralelismo esta acotado
-por el numero de nucleos del hardware: agregar mas goroutines mas alla
-del paralelismo real disponible no aporta beneficio medible pero si
-incrementa el overhead de memoria y scheduling del runtime de Go. La
-fraccion serial estimada es de aproximadamente 48% (Ley de Amdahl), lo
-que refleja tanto la lectura secuencial del CSV como la naturaleza del
-pipeline de 3 etapas, donde la etapa de Tokenizacion integra la
-limpieza de texto dentro del mismo worker.
+Las medias recortadas por etapa muestran solapamiento fuerte entre lectura, tokenizacion y lematizacion. Por ejemplo, en `N=4, b=1000` se observa `elapsed_read_ms=2,371`, `elapsed_token_ms=2,374` y `elapsed_lemma_ms=2,365`, con total de 2,377 ms. El mismo patron se repite en las demas configuraciones, lo que indica que la arquitectura en pipeline aprovecha bien la concurrencia entre etapas. En consecuencia, la mejora marginal adicional depende menos de acelerar una etapa aislada y mas de reducir el tramo critico global que queda en cada corrida.
 
-## Sobre los trade-offs de diseno
+## Sobre la degradacion relativa en N alto
 
-El analisis de retorno marginal muestra que el incremento de workers de
-1 a 2 reduce el tiempo de ejecucion en un 39% (de 9,007 a 5,506 ms),
-mientras que el incremento de 2 a 8 workers solo lo reduce en un 11%
-adicional (de 5,506 a 4,878 ms), a costa de un aumento del 140% en
-consumo de memoria (de 47 MB a 113 MB). Esto sugiere que el punto
-optimo costo-beneficio se encuentra en N=2 cuando los recursos de
-memoria son limitados, mientras que N=8 sigue siendo la configuracion
-mas rapida en terminos absolutos cuando la memoria no es restriccion.
+El caso `N=16, b=1000` exhibe la mayor dispersion (CV 10.5%) debido a un outlier de 3,798 ms dentro de sus cinco mediciones. Este comportamiento sugiere sensibilidad a condiciones de ejecucion del entorno (planificador, presion de memoria o ruido del sistema) cuando se incrementa la sobre-suscripcion de goroutines por etapa. En terminos practicos, `N=16` no solo es mas lento que `N=4`, sino tambien menos estable, por lo que no resulta una opcion recomendable para ejecuciones repetibles de benchmarking.
 
-## Sobre el efecto del tamano de lote (batch size)
+## Sobre el trade-off tiempo/memoria por batch size
 
-El estudio del impacto del tamano de lote sobre el rendimiento,
-manteniendo N=8 fijo, revela que batches mas grandes mejoran el
-tiempo total: con batches pequenos (100 documentos) el tiempo es
-4,934 ms y la contencion del mutex se eleva a 10.63 ms debido al
-alto numero de mensajes intercambiados entre etapas (10,000 batches
-en total). Con batches de 5,000 documentos el tiempo baja a 4,670 ms
-pero la memoria pico crece a 192 MB por la carga simultanea de mas
-documentos en RAM. El punto intermedio de batch=1,000 (4,878 ms, 113 MB)
-ofrece el mejor trade-off entre rendimiento y consumo de recursos,
-validando empiricamente la observacion de You (2025) sobre el balance
-entre granularidad de paralelismo y overhead de coordinacion en
-pipelines de NLP.
+Con `N=8` fijo, el mejor tiempo recortado aparece en `batch=5000` con **2,375 ms**, superando a `batch=1000` (2,494 ms) y `batch=100` (2,436 ms). Sin embargo, este beneficio temporal viene acompanado de una penalizacion de memoria: la memoria pico promedio sube a **321 MB** en `batch=5000`, frente a ~258-259 MB en los otros dos lotes. Por tanto, la eleccion de batch debe responder al objetivo operativo: `batch=5000` si se prioriza tiempo absoluto, o `batch=1000` si se busca un balance mas conservador de rendimiento y uso de RAM.
 
-## Sobre el overhead de sincronizacion (mutex)
+## Sobre sincronizacion y contencion
 
-La medicion de contencion del mutex global, que protege los contadores
-compartidos (tokens_globales, docs_procesados, docs_reales,
-docs_sinteticos) en correspondencia directa con el modelo Promela del
-PC1, arroja valores entre 1 y 10.63 ms en todas las configuraciones
-probadas. Este valor despreciable frente al tiempo total de ejecucion
-(>4,600 ms, representando menos del 0.3%) valida empiricamente la
-decision de diseno de delegar la agregacion de frecuencias lexicas a
-estructuras locales por worker (map[string]int) y reservar el mutex
-unicamente para contadores escalares, evitando el cuello de botella de
-sincronizacion reportado por Treviso et al. (2023) en pipelines de NLP
-con estado global compartido. La mayor contencion (10.63 ms) se observa
-con batch=100, donde el numero de adquisiciones de lock es 10x mayor
-que con batch=1,000.
+La metrica `mutex_contention_ms` reporta maximo **0.00 ms** en todas las configuraciones evaluadas, lo que indica ausencia de contencion medible sobre el lock global de contadores en esta tanda. Este resultado respalda el diseno de agregacion local por worker y sugiere que, en el estado actual, el mutex no constituye cuello de botella observable. En otras palabras, las diferencias de rendimiento entre configuraciones se explican principalmente por distribucion de carga, costos de scheduling y politicas de batch, no por bloqueo activo en la seccion critica.
 
-## Sobre la configuracion optima recomendada
+## Sobre determinismo funcional
 
-Configuracion optima del pipeline concurrente: N=8 workers por etapa
-(uno por nucleo logico) y batch_size=1,000 documentos. Esta combinacion
-ofrece un speedup de 1.85x para 1M registros (throughput de ~205,000
-docs/s) manteniendo el consumo de memoria controlado (113 MB) y la
-contencion de sincronizacion despreciable (<7 ms). Si la memoria no
-es restriccion, batch_size=5,000 alcanza un speedup de 1.93x a costa
-de 192 MB de memoria pico.
+Las 35 corridas conservaron exactamente los mismos resultados semanticos: `total_tokens=8,847,717`, `total_lemmas_unique=38,201`, `docs_reales=244,779` y `docs_sinteticos=755,221`. Esta invariancia frente a cambios de N y batch confirma que el pipeline concurrente mantiene consistencia funcional y que la paralelizacion afecta el tiempo de ejecucion, no la salida del procesamiento NLP.
+
+## Sobre la comparacion con la linea base secuencial
+
+Tomando como referencia la media recortada secuencial reportada de **613,593 ms**, la mejor configuracion concurrente en `batch=1000` (`N=4`) alcanza una relacion `T_seq/T_conc` de **258.1x**. Este cociente es util como indicador global de mejora empirica, pero debe interpretarse con cautela metodologica: incluye tanto el efecto de paralelizacion como las optimizaciones internas presentes en el flujo concurrente. Para una comparacion estrictamente iso-funcional, ambas implementaciones deberian compartir exactamente la misma estrategia de optimizacion interna.
