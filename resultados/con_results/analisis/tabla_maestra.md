@@ -1,105 +1,113 @@
-# Tabla Maestra de Estadísticas — Pipeline Concurrente NLP
+# Tabla Maestra de Estadisticas - Pipeline Concurrente NLP
 
-Datos generados con el binario actual (commit `a94e206 perf(concurrent): cachear lematizacion por worker`).
-7 configuraciones × 5 repeticiones = 35 corridas sobre `data/dataset_final_1M.csv` (1,000,000 registros).
-Hardware: 8 núcleos lógicos, Windows 11. Métrica reportada: `elapsed_total_ms`.
+Datos generados con el script actual de benchmarks.
+7 configuraciones x 5 repeticiones = 35 corridas sobre `data/dataset_final_1M.csv` (1,000,000 registros).
+Hardware: 8 nucleos logicos, Windows 11. Metrica reportada: `elapsed_total_ms`.
 
-## Estadísticas por configuración
+## Estadisticas por configuracion
 
 | Config | Mediciones (ms) | Media | Media recortada | StdDev | CV% |
 |:---|:---|---:|---:|---:|---:|
-| N=1, b=1000 | 10603, 11086, 11377, 12076, 12085 | 11,445 | **11,513** | 642 | 5.6% |
-| N=2, b=1000 | 7110, 7144, 7367, 7479, 7526 | 7,325 | **7,330** | 190 | 2.6% |
-| N=4, b=1000 | 5348, 5406, 5539, 5600, 5849 | 5,548 | **5,515** | 196 | 3.5% |
-| N=8, b=1000 | 6089, 6144, 6397, 6920, 8212 | 6,752 | **6,487** | 880 | 13.0% |
-| N=16, b=1000 | 9561, 9640, 9726, 9823, 10201 | 9,790 | **9,730** | 250 | 2.5% |
-| N=8, b=100 | 8159, 8433, 8958, 9487, 11754 | 9,358 | **8,959** | 1,433 | 15.3% |
-| N=8, b=5000 | 7461, 9034, 9076, 9297, 10060 | 8,986 | **9,136** | 947 | 10.5% |
+| N=1, b=1000 | 5375, 5404, 5447, 5451, 5489 | 5,433 | **5,434** | 40 | 0.7% |
+| N=2, b=1000 | 3093, 3103, 3104, 3173, 3176 | 3,130 | **3,127** | 38 | 1.2% |
+| N=4, b=1000 | 2353, 2366, 2368, 2396, 2431 | 2,383 | **2,377** | 29 | 1.2% |
+| N=8, b=1000 | 2344, 2411, 2511, 2560, 2614 | 2,488 | **2,494** | 99 | 4.0% |
+| N=16, b=1000 | 2909, 2984, 2994, 3057, 3798 | 3,148 | **3,012** | 330 | 10.5% |
+| N=8, b=100 | 2383, 2398, 2449, 2460, 2493 | 2,437 | **2,436** | 41 | 1.7% |
+| N=8, b=5000 | 2333, 2363, 2375, 2387, 2389 | 2,369 | **2,375** | 20 | 0.9% |
 
-Media recortada: se eliminan el valor mínimo y el máximo de las 5 mediciones y se promedian los 3 centrales.
+Media recortada: se eliminan el valor minimo y el maximo de las 5 mediciones y se promedian los 3 centrales.
 
-## Speedup con media recortada (baseline = N=1)
+## Speedup con media recortada (baseline = N=1, b=1000)
 
 | N workers | Tiempo recortado (ms) | Speedup | Eficiencia |
 |:---:|---:|---:|---:|
-| 1 | 11,513 | 1.00× | 100.0% |
-| 2 | 7,330 | 1.57× | 78.5% |
-| **4** | **5,515** | **2.09×** | **52.2%** |
-| 8 | 6,487 | 1.77× | 22.2% |
-| 16 | 9,730 | 1.18× | 7.4% |
+| 1 | 5,434 | 1.00x | 100.0% |
+| 2 | 3,127 | 1.74x | 86.9% |
+| **4** | **2,377** | **2.29x** | **57.2%** |
+| 8 | 2,494 | 2.18x | 27.2% |
+| 16 | 3,012 | 1.80x | 11.3% |
 
-**Hallazgo clave: el speedup óptimo es N=4 (2.09×), no N=8 ni N=16.** Más allá de N=4 el tiempo crece porque el cuello de botella se desplazó a la lectura secuencial del CSV (ver sección de tiempos por etapa).
+Hallazgo clave con `batch=1000`: el mejor punto es N=4.
 
 ## Tiempos por etapa (media recortada, ms)
 
-| Config | Lectura | Tokenización | Lematización | Total |
+| Config | Lectura | Tokenizacion | Lematizacion | Total |
 |:---|---:|---:|---:|---:|
-| N=1, b=1000 | 11,394 | 11,480 | 11,473 | 11,513 |
-| N=2, b=1000 | 7,252 | 7,296 | 7,283 | 7,330 |
-| N=4, b=1000 | 5,433 | 5,468 | 5,465 | 5,515 |
-| N=8, b=1000 | 6,385 | 6,420 | 6,419 | 6,487 |
-| N=16, b=1000 | 9,544 | 9,647 | 9,655 | 9,730 |
+| N=1, b=1000 | 5,418 | 5,420 | 5,419 | 5,434 |
+| N=2, b=1000 | 3,115 | 3,118 | 3,114 | 3,127 |
+| N=4, b=1000 | 2,371 | 2,374 | 2,365 | 2,377 |
+| N=8, b=1000 | 2,476 | 2,479 | 2,460 | 2,494 |
+| N=16, b=1000 | 2,999 | 3,002 | 2,972 | 3,012 |
 
-`elapsed_read_ms`, `elapsed_token_ms` y `elapsed_lemma_ms` miden el wall-clock de cada etapa (primer worker arrancando hasta último worker terminando). Con el caché de lematización, los tres tiempos convergen al wall-clock total: las tres etapas se solapan completamente y todas terminan junto con el lector. La etapa de lectura es ahora el límite inferior del pipeline.
+`elapsed_read_ms`, `elapsed_token_ms` y `elapsed_lemma_ms` muestran que las tres etapas permanecen casi solapadas; la duracion total sigue de cerca el tramo mas lento del pipeline en cada configuracion.
 
-## Análisis del batch size (N=8 fijo)
+## Analisis del batch size (N=8 fijo)
 
-| Batch size | Tiempo recortado (ms) | Memoria pico (MB) |
+| Batch size | Tiempo recortado (ms) | Memoria pico promedio (MB) |
 |:---:|---:|---:|
-| 100 | 8,959 | 109 |
-| **1000** | **6,487** | **144** |
-| 5000 | 9,136 | 309 |
+| 100 | 2,436 | 259 |
+| 1000 | 2,494 | 258 |
+| **5000** | **2,375** | **321** |
 
-Batch=1000 es óptimo. Batch=100 produce demasiados lotes (10,000 mensajes por canal) y aumenta la contención del mutex. Batch=5000 satura el canal: pocos lotes grandes provocan que workers queden ociosos esperando al lector, y la memoria pico se duplica.
+En esta corrida, `batch=5000` logra el mejor tiempo para N=8, pero con una penalizacion clara de memoria.
 
-## Memoria pico por configuración (promedio de las 5 reps)
+## Memoria pico por configuracion (promedio de las 5 reps)
 
 | Config | Memoria pico (MB) |
 |:---|---:|
-| N=1, b=1000 | 41 |
-| N=2, b=1000 | 62 |
-| N=4, b=1000 | 99 |
-| N=8, b=1000 | 144 |
-| N=16, b=1000 | 203 |
-| N=8, b=100 | 109 |
-| N=8, b=5000 | 309 |
+| N=1, b=1000 | 227 |
+| N=2, b=1000 | 242 |
+| N=4, b=1000 | 251 |
+| N=8, b=1000 | 258 |
+| N=16, b=1000 | 251 |
+| N=8, b=100 | 259 |
+| N=8, b=5000 | 321 |
 
-La memoria crece aproximadamente lineal con el número de workers porque cada worker mantiene su propio caché local de lematización (`map[string]string` de hasta ~38,000 entradas). Con N workers el costo agregado del caché es N × |vocab|.
+La memoria aumenta con lotes mas grandes y, en general, crece al subir el paralelismo hasta N=8 en este entorno.
 
-## Contención del mutex
+## Contencion del mutex
 
 | Config | mutex_contention_ms (max de 5 reps) |
 |:---|---:|
-| N=1, b=1000 | 2.39 |
-| N=2, b=1000 | 2.00 |
-| N=4, b=1000 | 1.52 |
-| N=8, b=1000 | 2.01 |
-| N=16, b=1000 | 1.00 |
-| N=8, b=100 | 6.06 |
-| N=8, b=5000 | 1.00 |
+| N=1, b=1000 | 0.00 |
+| N=2, b=1000 | 0.00 |
+| N=4, b=1000 | 0.00 |
+| N=8, b=1000 | 0.00 |
+| N=16, b=1000 | 0.00 |
+| N=8, b=100 | 0.00 |
+| N=8, b=5000 | 0.00 |
 
-La contención más alta (6.06 ms con batch=100) se da por las 10,000 adquisiciones de lock vs 1,000 con batch=1000. Aun así, es despreciable frente al total (>5,500 ms): <0.1% en todas las configuraciones.
+No se observa contencion medible del lock en estas 35 corridas.
 
-## Comparación con la línea base secuencial
+## Consistencia de salida
 
-La media recortada secuencial es de **613,593 ms** (~10:13 min) según `resultados/seq_results/resumen_benchmarks_seq.md`, medida sobre el mismo `dataset_final_1M.csv` con el lematizador por n-gramas (sin caché).
+Se verifico determinismo en las 35 ejecuciones:
+- `total_tokens = 8,847,717`
+- `total_lemmas_unique = 38,201`
+- `docs_reales = 244,779`
+- `docs_sinteticos = 755,221`
+
+Los valores se mantienen identicos sin importar N o batch.
+
+## Comparacion con la linea base secuencial
+
+La media recortada secuencial reportada es **613,593 ms** (~10:13 min) segun `resultados/seq_results/resumen_benchmarks_seq.md`.
 
 | Config concurrente | Tiempo conc. (ms) | T_seq / T_conc |
 |:---|---:|---:|
-| N=1, b=1000 | 11,513 | 53.3× |
-| N=2, b=1000 | 7,330 | 83.7× |
-| **N=4, b=1000** | **5,515** | **111.3×** |
-| N=8, b=1000 | 6,487 | 94.6× |
-| N=16, b=1000 | 9,730 | 63.1× |
+| N=1, b=1000 | 5,434 | 113.0x |
+| N=2, b=1000 | 3,127 | 196.2x |
+| **N=4, b=1000** | **2,377** | **258.1x** |
+| N=8, b=1000 | 2,494 | 246.0x |
+| N=16, b=1000 | 3,012 | 203.7x |
 
-**Observación metodológica importante**: este speedup mezcla dos efectos: (a) la paralelización propiamente dicha y (b) la memoización local en cada worker concurrente, optimización que el pipeline secuencial actual no incorpora. Una comparación estrictamente iso-funcional requeriría aplicar el mismo caché al secuencial.
+Nota metodologica: esta comparacion combina paralelizacion y optimizaciones internas del pipeline concurrente; no es una comparacion iso-funcional pura si el secuencial no replica exactamente las mismas optimizaciones.
 
 ## Hallazgos clave
 
-1. **Speedup óptimo: 2.09× con N=4 workers y batch=1000.** A diferencia de mediciones previas donde N=8 era el sweet spot, el caché de lematización desplazó el cuello de botella a la lectura del CSV y volvió contraproducente agregar más de 4 workers.
-2. **N=8 y N=16 son más lentos que N=4** (6,487 y 9,730 ms vs 5,515 ms): el overhead de scheduling, la fragmentación del caché por worker y la presión sobre la memoria superan el beneficio del paralelismo cuando el lector ya es el cuello de botella.
-3. **Fracción serial estimada (Amdahl): ~50–60%**, dominada por la lectura secuencial del CSV. Con `bufio.NewReaderSize(1<<20)` y `csv.Reader`, el lector procesa los 179 MB del dataset en ~5–6 s mínimo, lo que constituye el piso del wall-clock alcanzable.
-4. **El batch=1000 sigue siendo el mejor trade-off** (6,487 ms con 144 MB); batch=100 introduce demasiados mensajes y batch=5000 consume 309 MB sin ganancia de velocidad.
-5. **Contención del mutex despreciable** (<7 ms sobre >5,500 ms totales): valida el diseño de agregación local por worker.
-6. **Determinismo verificado**: `total_tokens=8,847,793` y `total_lemmas_unique=38,201` idénticos en las 35 corridas, independiente de N y batch.
-7. **Caché por worker como optimización dominante**: comparado contra una corrida sin caché (227,229 ms para N=8, b=1000), el caché aporta un speedup interno de **35× sobre la misma topología**, mientras que el paralelismo aporta 2.09× adicional. La memoización local es ahora el efecto de primer orden.
+1. Con `batch=1000`, el mejor speedup aparece en N=4 (2.29x), con buena eficiencia (57.2%).
+2. N=16 muestra alta variabilidad (CV 10.5%) por un outlier de 3,798 ms.
+3. Para N=8, `batch=5000` mejora tiempo frente a `batch=1000`, pero sube memoria de ~258 MB a 321 MB.
+4. La contencion de mutex no es factor limitante en esta tanda (0.00 ms max por configuracion).
+5. Los resultados funcionales son deterministas en todas las corridas (tokens, lemas y conteo real/sintetico constantes).
