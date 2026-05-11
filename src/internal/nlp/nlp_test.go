@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// Clean tests
+// --------------- Clean tests ---------------
 
 func TestClean(t *testing.T) {
 	tests := []struct {
@@ -34,7 +34,7 @@ func TestClean(t *testing.T) {
 	}
 }
 
-// Tokenize tests
+// --------------- Tokenize tests ---------------
 
 func TestTokenize(t *testing.T) {
 	tests := []struct {
@@ -85,6 +85,16 @@ func TestTokenize(t *testing.T) {
 		})
 	}
 }
+
+// --------------- Lemmatize tests ---------------
+//
+// El lematizador fue actualizado a similitud coseno de n-gramas de caracteres
+// (inspirado en FastText, Bojanowski 2017). Los outputs ya no son stems crudos
+// sino formas canónicas del vocabulario legal o stems de fallback cuando la
+// similitud no supera el umbral (0.42).
+//
+// Invariante clave: Lemmatize siempre retorna una string no vacía para
+// cualquier token de longitud >= 3, y retorna el token original para len < 3.
 
 func TestLemmatize(t *testing.T) {
 	tests := []struct {
