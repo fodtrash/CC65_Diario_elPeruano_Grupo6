@@ -111,14 +111,14 @@ func BenchmarkLemmatize(b *testing.B) {
 	writeBenchmarkArtifact("BenchmarkLemmatize", "synthetic-stage", 1, b.N, b.N, time.Since(start))
 }
 
-// BenchmarkApplySuffixRules mide el costo de la lematización heurística.
-func BenchmarkApplySuffixRules(b *testing.B) {
+// BenchmarkNlpLemmatize mide el costo de la lematización por n-gramas (internal/nlp).
+func BenchmarkNlpLemmatize(b *testing.B) {
 	words := []string{
-		"realización",
+		"resolucion",
 		"corriendo",
-		"estudiando",
+		"establecimiento",
 		"procesadas",
-		"eliminación",
+		"designacion",
 		"frecuentemente",
 		"ingresos",
 	}
@@ -127,10 +127,10 @@ func BenchmarkApplySuffixRules(b *testing.B) {
 	start := time.Now()
 	for i := 0; i < b.N; i++ {
 		for _, w := range words {
-			applySuffixRules(w)
+			nlpLemmatize(w)
 		}
 	}
-	writeBenchmarkArtifact("BenchmarkApplySuffixRules", "synthetic-stage", 1, len(words), b.N, time.Since(start))
+	writeBenchmarkArtifact("BenchmarkNlpLemmatize", "synthetic-stage", 1, len(words), b.N, time.Since(start))
 }
 
 // ── Benchmarks comparativos (para speedup análisis) ──────────────────────────

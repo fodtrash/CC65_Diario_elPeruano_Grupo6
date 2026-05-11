@@ -87,17 +87,6 @@ func TestTokenize(t *testing.T) {
 }
 
 // --------------- Lemmatize tests ---------------
-<<<<<<< HEAD
-//
-// El lematizador fue actualizado a similitud coseno de n-gramas de caracteres
-// (inspirado en FastText, Bojanowski 2017). Los outputs ya no son stems crudos
-// sino formas canónicas del vocabulario legal o stems de fallback cuando la
-// similitud no supera el umbral (0.42).
-//
-// Invariante clave: Lemmatize siempre retorna una string no vacía para
-// cualquier token de longitud >= 3, y retorna el token original para len < 3.
-=======
->>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 
 func TestLemmatize(t *testing.T) {
 	tests := []struct {
@@ -105,7 +94,6 @@ func TestLemmatize(t *testing.T) {
 		in   string
 		want string
 	}{
-<<<<<<< HEAD
 		// Matches vocabulario legal — retorna forma canónica más cercana
 		{"designacion -> asignacion (vocab match)", "designacion", "asignacion"},
 		{"establecimiento -> establecer (vocab match)", "establecimiento", "establecer"},
@@ -125,24 +113,6 @@ func TestLemmatize(t *testing.T) {
 		{"ado -> estado (vocab match)", "ado", "estado"},
 		{"ida -> partida (vocab match)", "ida", "partida"},
 		{"fiscal -> fiscalia (vocab match)", "fiscal", "fiscalia"},
-=======
-		{"acion suffix", "designacion", "design"},
-		{"imiento suffix", "establecimiento", "establec"},
-		{"amente suffix", "directamente", "direct"},
-		{"ado suffix", "autorizado", "autoriz"},
-		{"ada suffix", "aprobada", "aprob"},
-		{"ando suffix", "procesando", "proces"},
-		{"iendo suffix", "corriendo", "corr"},
-		{"idad suffix", "seguridad", "segur"},
-		{"no match", "fiscal", "fiscal"},
-		{"short word no strip", "ado", "ado"},
-		{"short word no strip 2", "ida", "ida"},
-		{"amiento suffix", "procesamiento", "proces"},
-		{"oso suffix", "peligroso", "peligr"},
-		{"izar suffix", "normalizar", "normal"},
-		{"icion suffix", "adquisicion", "adquis"},
-		{"sion suffix", "comision", "comi"},
->>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -154,7 +124,6 @@ func TestLemmatize(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
 // TestLemmatizeInvariants verifica propiedades invariantes del nuevo lematizador.
 func TestLemmatizeInvariants(t *testing.T) {
 	// Tokens cortos: len < 3 se retornan sin modificar
@@ -186,8 +155,6 @@ func TestLemmatizeInvariants(t *testing.T) {
 	}
 }
 
-=======
->>>>>>> b8159a374f862fcac776101804797b85ba00d6a8
 // --------------- Benchmarks ---------------
 
 var sampleSumilla = "designan directora ejecutiva del programa nacional de apoyo directo a los mas pobres juntos"
