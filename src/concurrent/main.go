@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/csv"
 	"encoding/json"
 	"flag"
@@ -122,7 +123,7 @@ func main() {
 		}
 		defer f.Close()
 
-		reader := csv.NewReader(f)
+		reader := csv.NewReader(bufio.NewReaderSize(f, 1<<20))
 		reader.LazyQuotes = true
 		reader.FieldsPerRecord = 7
 
@@ -214,7 +215,11 @@ func main() {
 	for i := 0; i < *workersLemma; i++ {
 		go func() {
 			defer wgLemma.Done()
-			local := localResult{lemmaCounts: make(map[string]int)}
+			local := localResult{lemmaCounts: make(map[string]int, 16384)}
+			// Memoización local: nlp.Lemmatize es puro y determinístico, y el
+			// texto legal repite intensamente el mismo vocabulario. Cachear
+			// tok→lemma por worker evita ~127 cosineSim por token tras warmup.
+			lemmaCache := make(map[string]string, 8192)
 			for batch := range chLemmas {
 				atomic.CompareAndSwapInt64(&lemmaStart, 0, time.Now().UnixNano())
 				// Contadores locales del batch para minimizar tiempo bajo mutex
@@ -222,7 +227,11 @@ func main() {
 				for j := range batch {
 					lemmas := make([]string, len(batch[j].Tokens))
 					for k, tok := range batch[j].Tokens {
-						lemma := nlp.Lemmatize(tok)
+						lemma, ok := lemmaCache[tok]
+						if !ok {
+							lemma = nlp.Lemmatize(tok)
+							lemmaCache[tok] = lemma
+						}
 						lemmas[k] = lemma
 						local.lemmaCounts[lemma]++
 					}
