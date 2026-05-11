@@ -6,4 +6,3 @@ La diferencia de escala respecto a mediciones anteriores se debe a que la versi�
 
 Un hallazgo relevante en esta serie de pruebas es la estabilidad del consumo de recursos. El proceso mantuvo un **Peak Memory promedio de 285.08 MB**, con una oscilación mínima (entre 283.97 MB y 287.42 MB). Esto confirma que el pipeline secuencial mantiene una huella de memoria eficiente y predecible al procesar los documentos de forma unitaria, sin la sobrecarga de buffers o canales concurrentes.
 
-El resultado actualiza la relación de eficiencia. Con la referencia concurrente del sistema, el speedup frente a la mejor configuración (4.670 s) se sitúa en **~125.76x**. Este valor, al superar el número de núcleos físicos, sugiere que la implementación concurrente se beneficia no solo del paralelismo, sino posiblemente de una gestión de memoria o de tipos de datos más eficiente que la versión secuencial pura.

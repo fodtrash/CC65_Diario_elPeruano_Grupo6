@@ -20,12 +20,3 @@ Esta tabla resume el procesamiento end-to-end del dataset final de 1,000,000 reg
 | 3 | 558.769 | 1,789.47 | 558,769.12 | 285.73 |
 | 4 | 685.165 | 1,478.47 | 685,164.71 | 287.42 |
 | 5 | 665.050 | 1,503.56 | 665,049.71 | 284.14 |
-
-## Comparación de Speedup
-
-Tomando como base la media recortada de **587.291 s**:
-
-| Configuración concurrente | T_conc (s) | Speedup ($T_{seq} / T_{conc}$) |
-|:---|---:|---:|
-| N=1, b=1000 (concurrente) | 9.007 | 65.20x |
-| N=8, b=5000 (mejor config) | 4.670 | **125.76x** |
